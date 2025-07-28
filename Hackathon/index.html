@@ -44,7 +44,9 @@
         async function generateCombos() {
             const day = document.getElementById('daySelect').value;
             const result = document.getElementById('result');
+            const allDaysResult = document.getElementById('allDaysResult');
             
+            // Clear all days result when generating single day
             result.innerHTML = 'Generating 3 combos...';
             
             try {
@@ -69,6 +71,10 @@
 
         async function generateAllDays() {
             const allDaysResult = document.getElementById('allDaysResult');
+            const result = document.getElementById('result');
+            
+            // Clear single day result when generating all days
+            result.innerHTML = '';
             allDaysResult.innerHTML = 'Generating combos for all week days...';
             
             const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];

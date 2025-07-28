@@ -4,121 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shamir's Secret Sharing - Catalog Assignment</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: white;
-        }
-        
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        
-        h1 {
-            text-align: center;
-        }
-        
-        .problem-description {
-            background-color: #f0f0f0;
-            padding: 15px;
-            margin: 15px 0;
-            border: 1px solid #ccc;
-        }
-        
-        .testcase {
-            background-color: #f9f9f9;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #000;
-        }
-        
-        textarea {
-            width: 100%;
-            height: 200px;
-            padding: 5px;
-            border: 1px solid #000;
-            font-family: monospace;
-            font-size: 12px;
-        }
-        
-        button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            margin: 5px;
-        }
-        
-        .result {
-            background-color: #d4edda;
-            padding: 15px;
-            margin: 15px 0;
-            border: 1px solid #000;
-        }
-        
-        .error {
-            background-color: #f8d7da;
-            padding: 15px;
-            margin: 15px 0;
-            border: 1px solid #000;
-        }
-        
-        .secret-result {
-            background-color: #28a745;
-            color: white;
-            padding: 20px;
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            margin: 20px 0;
-            border: 2px solid #000;
-        }
-        
-        .step {
-            background-color: #f9f9f9;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #000;
-        }
-        
-        .decoded-shares {
-            background-color: #e7f3ff;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #000;
-            font-family: monospace;
-        }
-        
-        pre {
-            background-color: #f0f0f0;
-            padding: 10px;
-            border: 1px solid #000;
-            overflow-x: auto;
-            font-size: 11px;
-        }
-        
-        .file-input {
-            margin: 10px 0;
-        }
-    </style>
 </head>
 <body>
-    <div class="container">
-        <h1> Shamir's Secret Sharing - Catalog Assignment</h1>
-        
-        <div class="problem-description">
-            <h3>Problem Statement:</h3>
-            <p><strong>Goal:</strong> Find the constant term 'c' of an unknown polynomial f(x) = a_m x^m + ... + a_1 x + c</p>
-            <p><strong>Method:</strong> Use Lagrange interpolation with decoded share points</p>
-            <p><strong>Input:</strong> JSON with shares in different bases</p>
-            <p><strong>Output:</strong> The secret constant term 'c'</p>
-        </div>
-
-        <div class="testcase">
-            <h3>Test Case 1:</h3>
-            <textarea id="testcase1" readonly>{
+    <h1>Shamir's Secret Sharing Solution</h1>
+    <div class="section">
+        <h3>Test Case 1</h3>
+        <textarea id="test1">{
     "keys": {
         "n": 4,
         "k": 3
@@ -140,11 +31,11 @@
         "value": "213"
     }
 }</textarea>
-        </div>
+    </div>
 
-        <div class="testcase">
-            <h3>Test Case 2:</h3>
-            <textarea id="testcase2" readonly>{
+    <div class="section">
+        <h3>Test Case 2</h3>
+        <textarea id="test2">{
     "keys": {
         "n": 10,
         "k": 7
@@ -190,246 +81,123 @@
         "value": "1101613130313526312514143"
     }
 }</textarea>
-        </div>
-
-        <div style="text-align: center;">
-            <button onclick="solveTestCase1()"> Solve Test Case 1</button>
-            <button onclick="solveTestCase2()"> Solve Test Case 2</button>
-            <button onclick="solveBothTestCases()"> Solve Both Test Cases</button>
-        </div>
-
-        <div id="results"></div>
     </div>
 
+    <div style="text-align: center; margin: 30px 0;">
+        <button onclick="solve()">SOLVE BOTH TEST CASES</button>
+    </div>
+
+    <div id="output"></div>
+
     <script>
-        function decodeFromBase(value, base) {
-            // Convert value from given base to decimal using BigInt for large numbers
+        // Base conversion function
+        function convertFromBase(value, base) {
             let result = 0n;
-            let baseValue = BigInt(base);
-            let valueStr = value.toString().toLowerCase();
+            let baseVal = BigInt(base);
             
-            for (let i = 0; i < valueStr.length; i++) {
-                let digit = valueStr[i];
-                let digitValue;
+            for (let i = 0; i < value.length; i++) {
+                let char = value[i].toLowerCase();
+                let digit;
                 
-                // Handle digits 0-9 and letters a-z for bases > 10
-                if (digit >= '0' && digit <= '9') {
-                    digitValue = BigInt(digit.charCodeAt(0) - '0'.charCodeAt(0));
-                } else if (digit >= 'a' && digit <= 'z') {
-                    digitValue = BigInt(digit.charCodeAt(0) - 'a'.charCodeAt(0) + 10);
+                if (char >= '0' && char <= '9') {
+                    digit = BigInt(char.charCodeAt(0) - '0'.charCodeAt(0));
                 } else {
-                    throw new Error(`Invalid digit '${digit}' for base ${base}`);
+                    digit = BigInt(char.charCodeAt(0) - 'a'.charCodeAt(0) + 10);
                 }
                 
-                if (digitValue >= baseValue) {
-                    throw new Error(`Digit '${digit}' is invalid for base ${base}`);
-                }
-                
-                result = result * baseValue + digitValue;
+                result = result * baseVal + digit;
             }
             
             return result;
         }
 
-        
-        function parseAndDecodeShares(jsonData) {
-            let shares = [];
-            let keys = jsonData.keys;
-            let n = keys.n;
-            let k = keys.k;
-            
-            console.log(`📊 Parsing ${n} shares, need ${k} for polynomial of degree ${k-1}`);
-            
-            
-            for (let key in jsonData) {
-                if (key !== 'keys') {
-                    let shareData = jsonData[key];
-                    let x = BigInt(key);
-                    let base = parseInt(shareData.base);
-                    let encodedValue = shareData.value;
-                    
-                    let y = decodeFromBase(encodedValue, base);
-                    
-                    shares.push([x, y]);
-                    console.log(`Share ${key}: base ${base}, value "${encodedValue}" → decimal ${y}`);
-                }
-            }
-            
-            return { shares, n, k };
-        }
-
-        function lagrangeInterpolation(points) {
+        // Lagrange interpolation to find secret
+        function findSecret(points) {
             let secret = 0n;
-            let n = points.length;
             
-            console.log(`🔢 Using Lagrange interpolation with ${n} points:`);
-            
-            for (let i = 0; i < n; i++) {
+            for (let i = 0; i < points.length; i++) {
                 let xi = points[i][0];
                 let yi = points[i][1];
                 
-                console.log(`  Point ${i}: (${xi}, ${yi})`);
+                let num = 1n;
+                let den = 1n;
                 
-                // Calculate Lagrange basis polynomial Li(0)
-                let numerator = 1n;
-                let denominator = 1n;
-                
-                for (let j = 0; j < n; j++) {
+                for (let j = 0; j < points.length; j++) {
                     if (i !== j) {
                         let xj = points[j][0];
-                        numerator *= (0n - xj);      // (0 - xj)
-                        denominator *= (xi - xj);    // (xi - xj)
+                        num *= (0n - xj);
+                        den *= (xi - xj);
                     }
                 }
                 
-                // Calculate contribution: yi * Li(0)
-                let contribution = yi * numerator / denominator;
-                secret += contribution;
-                
-                console.log(`    L${i}(0) = ${numerator}/${denominator}, contribution = ${contribution}`);
+                secret += yi * num / den;
             }
             
-            console.log(`🎯 Final secret (constant term): ${secret}`);
             return secret;
         }
 
-        // Step 4: Choose k points from n available shares
-        function chooseKPoints(shares, k) {
-            // For this assignment, we'll use the first k shares
-            // In a real scenario, you might want to test different combinations
-            return shares.slice(0, k);
-        }
-
-        // Main solving function
-        function solveSecretSharing(jsonData, testCaseName) {
-            console.log(`\n🔍 Solving ${testCaseName}:`);
-            console.log('=====================================');
+        // Solve single test case
+        function solveTestCase(jsonData) {
+            let points = [];
+            let k = jsonData.keys.k;
             
+            // Extract and decode points
+            for (let key in jsonData) {
+                if (key !== 'keys') {
+                    let x = BigInt(key);
+                    let base = parseInt(jsonData[key].base);
+                    let encodedValue = jsonData[key].value;
+                    let y = convertFromBase(encodedValue, base);
+                    points.push([x, y]);
+                }
+            }
+            let selectedPoints = points.slice(0, k);
+            let secret = findSecret(selectedPoints);
+            
+            return {
+                secret: secret.toString(),
+                points: points,
+                selectedPoints: selectedPoints,
+                k: k
+            };
+        }
+        function solve() {
+            let output = document.getElementById('output');
+            output.innerHTML = '';  
             try {
-                // Step 1: Parse and decode shares
-                let { shares, n, k } = parseAndDecodeShares(jsonData);
+                let test1Data = JSON.parse(document.getElementById('test1').value);
+                let test2Data = JSON.parse(document.getElementById('test2').value);
+                let result1 = solveTestCase(test1Data);
+                let result2 = solveTestCase(test2Data);
                 
-                // Step 2: Choose k points for interpolation
-                let selectedPoints = chooseKPoints(shares, k);
-                console.log(`\n📋 Selected ${k} points for interpolation:`);
-                selectedPoints.forEach((point, i) => {
-                    console.log(`  Point ${i+1}: (${point[0]}, ${point[1]})`);
-                });
                 
-                // Step 3: Find secret using Lagrange interpolation
-                console.log(`\n🧮 Applying Lagrange interpolation:`);
-                let secret = lagrangeInterpolation(selectedPoints);
-                
-                return {
-                    success: true,
-                    secret: secret.toString(),
-                    shares: shares,
-                    n: n,
-                    k: k,
-                    selectedPoints: selectedPoints
-                };
+                output.innerHTML = `
+                    <div class="result">
+                        <h3>Test Case 1</h3>
+                        <div class="secret">SECRET: ${result1.secret}</div>
+                        <p>Polynomial degree: ${result1.k - 1} | Points used: ${result1.k}</p>
+                    </div>
+                    
+                    <div class="result">
+                        <h3>Test Case 2</h3>
+                        <div class="secret">SECRET: ${result2.secret}</div>
+                        <p>Polynomial degree: ${result2.k - 1} | Points used: ${result2.k}</p>
+                    </div>
+                    
+                    <div class="result">
+                        <h3><strong>FINAL ANSWERS</strong></h3>
+                        <p><strong>Test Case 1:</strong> ${result1.secret}</p>
+                        <p><strong>Test Case 2:</strong> ${result2.secret}</p>
+                    </div>
+                `;
+                console.log('CATALOG ASSIGNMENT SOLUTIONS:');
+                console.log('Test Case 1 Secret:', result1.secret);
+                console.log('Test Case 2 Secret:', result2.secret);
                 
             } catch (error) {
-                console.error(`❌ Error in ${testCaseName}:`, error);
-                return {
-                    success: false,
-                    error: error.message
-                };
+                output.innerHTML = `<div class="error">Error: ${error.message}</div>`;
             }
         }
-
-        // Display results in HTML
-        function displayResults(results, testCaseName) {
-            let html = `<h3>Results for ${testCaseName}:</h3>`;
-            
-            if (results.success) {
-                html += `<div class="secret-result">SECRET: ${results.secret}</div>`;
-                
-                html += `<div class="result">
-                    <strong>✅ Solution Found!</strong><br>
-                    Total shares (n): ${results.n}<br>
-                    Required shares (k): ${results.k}<br>
-                    Polynomial degree: ${results.k - 1}<br>
-                    Points used: ${results.selectedPoints.length}
-                </div>`;
-                
-                html += `<div class="step"><strong>Decoded Shares:</strong></div>`;
-                html += `<div class="decoded-shares">`;
-                results.shares.forEach((share, i) => {
-                    html += `Share ${share[0]}: (${share[0]}, ${share[1]})<br>`;
-                });
-                html += `</div>`;
-                
-                html += `<div class="step"><strong>Selected Points for Interpolation:</strong></div>`;
-                html += `<div class="decoded-shares">`;
-                results.selectedPoints.forEach((point, i) => {
-                    html += `Point ${i+1}: (${point[0]}, ${point[1]})<br>`;
-                });
-                html += `</div>`;
-                
-            } else {
-                html += `<div class="error">❌ Error: ${results.error}</div>`;
-            }
-            
-            return html;
-        }
-
-        // Solve individual test cases
-        function solveTestCase1() {
-            let jsonText = document.getElementById('testcase1').value;
-            let jsonData = JSON.parse(jsonText);
-            let results = solveSecretSharing(jsonData, "Test Case 1");
-            document.getElementById('results').innerHTML = displayResults(results, "Test Case 1");
-        }
-
-        function solveTestCase2() {
-            let jsonText = document.getElementById('testcase2').value;
-            let jsonData = JSON.parse(jsonText);
-            let results = solveSecretSharing(jsonData, "Test Case 2");
-            document.getElementById('results').innerHTML = displayResults(results, "Test Case 2");
-        }
-
-        function solveBothTestCases() {
-            console.clear();
-            console.log('🎯 SHAMIR\'S SECRET SHARING - CATALOG ASSIGNMENT');
-            console.log('================================================');
-            
-            // Solve Test Case 1
-            let jsonText1 = document.getElementById('testcase1').value;
-            let jsonData1 = JSON.parse(jsonText1);
-            let results1 = solveSecretSharing(jsonData1, "Test Case 1");
-            
-            // Solve Test Case 2
-            let jsonText2 = document.getElementById('testcase2').value;
-            let jsonData2 = JSON.parse(jsonText2);
-            let results2 = solveSecretSharing(jsonData2, "Test Case 2");
-            
-            // Display both results
-            let html = displayResults(results1, "Test Case 1");
-            html += "<hr style='margin: 30px 0;'>";
-            html += displayResults(results2, "Test Case 2");
-            
-            // Summary
-            html += `<div class="result">
-                <h3>📋 FINAL SUMMARY:</h3>
-                <strong>Test Case 1 Secret:</strong> ${results1.success ? results1.secret : 'Error'}<br>
-                <strong>Test Case 2 Secret:</strong> ${results2.success ? results2.secret : 'Error'}
-            </div>`;
-            
-            document.getElementById('results').innerHTML = html;
-            
-            // Also log to console for easy copying
-            console.log('\n🎯 FINAL ANSWERS:');
-            console.log('==================');
-            console.log(`Test Case 1 Secret: ${results1.success ? results1.secret : 'Error'}`);
-            console.log(`Test Case 2 Secret: ${results2.success ? results2.secret : 'Error'}`);
-        }
-
-        // Auto-load and show hint
-        window.onload = function() {
-            console.log('💡 Tip: Click "Solve Both Test Cases" to see detailed step-by-step solutions!');
-            console.log('📋 All calculations will be shown in this console.');
-        };
     </script>
 </body>
 </html>

@@ -65,12 +65,10 @@ The solution provides secrets for both test cases:
 ```
 
 ## Assignment Requirements Met
-✅ Read JSON input from test cases  
-✅ Decode Y values from different bases  
-✅ Find secret using mathematical interpolation  
-✅ No external libraries used  
-✅ Handle 256-bit numbers  
-✅ Pure JavaScript implementation  
+ Read JSON input from test cases  
+ Decode Y values from different bases  
+ Find secret using mathematical interpolation  
+ No external libraries used  
+ Handle 256-bit numbers  
+ Pure JavaScript implementation  
 
-## Author
-Created for Catalog Placements Assignment

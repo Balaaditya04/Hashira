@@ -1,4 +1,9 @@
-# Shamir's Secret Sharing Solution
+## 🚀 Deployment Links
+- **Repository**: `https://github.com/balaaditya04/Hashira`
+- **Live Demo**: `https://balaaditya04.github.io/Hashira/`# Shamir's Secret Sharing Solution
+
+## 🔗 Live Demo
+**[View Live Solution](https://balaaditya04.github.io/Hashira/)**
 
 ## Overview
 This project implements Shamir's Secret Sharing algorithm to find the constant term of an unknown polynomial using Lagrange interpolation.
@@ -19,10 +24,10 @@ This project implements Shamir's Secret Sharing algorithm to find the constant t
 - `README.md` - This file
 
 ## How to Use
-1. **Live Demo**: [Add your GitHub Pages URL here]
-2. **Local**: Open `index.html` in any web browser
-3. Click "SOLVE BOTH TEST CASES" button
-4. View results on screen and in browser console
+1. **🌐 Live Demo**: [Click here to use online](https://balaaditya04.github.io/Hashira/)
+2. **💻 Local**: Download `index.html` and open in any web browser
+3. **▶️ Run**: Click "SOLVE BOTH TEST CASES" button to get results
+4. **📋 Results**: View secrets on screen and in browser console
 
 ## Output
 The solution provides secrets for both test cases:
@@ -65,10 +70,9 @@ The solution provides secrets for both test cases:
 ```
 
 ## Assignment Requirements Met
- Read JSON input from test cases  
- Decode Y values from different bases  
- Find secret using mathematical interpolation  
- No external libraries used  
- Handle 256-bit numbers  
- Pure JavaScript implementation  
-
+✅ Read JSON input from test cases  
+✅ Decode Y values from different bases  
+✅ Find secret using mathematical interpolation  
+✅ No external libraries used  
+✅ Handle 256-bit numbers  
+✅ Pure JavaScript implementation  

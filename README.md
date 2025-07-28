@@ -1,7 +1,3 @@
-## 🚀 Deployment Links
-- **Repository**: `https://github.com/balaaditya04/Hashira`
-- **Live Demo**: `https://balaaditya04.github.io/Hashira/`# Shamir's Secret Sharing Solution
-
 ## 🔗 Live Demo
 **[View Live Solution](https://balaaditya04.github.io/Hashira/)**
 

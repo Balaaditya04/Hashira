@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Restaurant Combo Generator</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        select, button { padding: 10px; margin: 10px; }
+        .combo { border: 1px solid #ccc; margin: 10px 0; padding: 10px; }
+        .item { margin: 5px 0; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .taste-profile { color: #666; font-style: italic; }
+        .popularity { color: #888; font-size: 12px; }
+        .day-section { margin: 20px 0; border-top: 2px solid #ddd; padding-top: 15px; }
+        .day-title { font-size: 18px; font-weight: bold; color: #333; margin-bottom: 10px; }
+        .all-days { margin-top: 30px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Restaurant Combo Generator</h1>
+            <p>Generate 3 unique combos per day</p>
+        </div>
+        
+        <select id="daySelect">
+            <option value="monday">Monday</option>
+            <option value="tuesday">Tuesday</option>
+            <option value="wednesday">Wednesday</option>
+            <option value="thursday">Thursday</option>
+            <option value="friday">Friday</option>
+            <option value="saturday">Saturday</option>
+            <option value="sunday">Sunday</option>
+        </select>
+        
+        <button onclick="generateCombos()">Generate 3 Combos</button>
+        <button onclick="generateAllDays()">Generate All Week</button>
+        
+        <div id="result"></div>
+        <div id="allDaysResult" class="all-days"></div>
+    </div>
+
+    <script>
+        async function generateCombos() {
+            const day = document.getElementById('daySelect').value;
+            const result = document.getElementById('result');
+            
+            result.innerHTML = 'Generating 3 combos...';
+            
+            try {
+                const response = await fetch('/api/generate-combos', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({day: day})
+                });
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    result.innerHTML = `<p style="color: red;">${data.error}</p>`;
+                    return;
+                }
+                
+                displayCombos(data.combos, day);
+            } catch (error) {
+                result.innerHTML = 'Error generating combos';
+            }
+        }
+
+        async function generateAllDays() {
+            const allDaysResult = document.getElementById('allDaysResult');
+            allDaysResult.innerHTML = 'Generating combos for all week days...';
+            
+            const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+            let allDaysHtml = '<h2>All Week Combos:</h2>';
+            
+            for (const day of days) {
+                try {
+                    const response = await fetch('/api/generate-combos', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({day: day})
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.error) {
+                        allDaysHtml += `<p style="color: red;">${day}: ${data.error}</p>`;
+                        continue;
+                    }
+                    
+                    allDaysHtml += `
+                        <div class="day-section">
+                            <div class="day-title">${day.charAt(0).toUpperCase() + day.slice(1)} - Preferred Taste: ${data.dayTasteProfile}</div>
+                    `;
+                    
+                    data.combos.forEach((combo, index) => {
+                        allDaysHtml += `
+                            <div class="combo">
+                                <h4>Combo ${index + 1}</h4>
+                                <div class="item">Main: ${combo.main.item_name} (${combo.main.calories} cal, ${combo.main.taste_profile})</div>
+                                <div class="item">Side: ${combo.side.item_name} (${combo.side.calories} cal, ${combo.side.taste_profile})</div>
+                                <div class="item">Drink: ${combo.drink.item_name} (${combo.drink.calories} cal, ${combo.drink.taste_profile})</div>
+                                <div class="item"><strong>Total: ${combo.totalCalories} calories</strong></div>
+                                <div class="taste-profile">Taste Profile: ${combo.tasteProfile}</div>
+                                <div class="popularity">Avg Popularity: ${combo.popularityScore.toFixed(2)}</div>
+                            </div>
+                        `;
+                    });
+                    
+                    allDaysHtml += '</div>';
+                    
+                } catch (error) {
+                    allDaysHtml += `<p style="color: red;">${day}: Error generating combos</p>`;
+                }
+            }
+            
+            allDaysResult.innerHTML = allDaysHtml;
+        }
+
+        function displayCombos(combos, day) {
+            const result = document.getElementById('result');
+            let html = `<h3>${day.charAt(0).toUpperCase() + day.slice(1)} - 3 Combos:</h3>`;
+            
+            combos.forEach((combo, index) => {
+                html += `
+                    <div class="combo">
+                        <h4>Combo ${index + 1}</h4>
+                        <div class="item">Main: ${combo.main.item_name} (${combo.main.calories} cal, ${combo.main.taste_profile})</div>
+                        <div class="item">Side: ${combo.side.item_name} (${combo.side.calories} cal, ${combo.side.taste_profile})</div>
+                        <div class="item">Drink: ${combo.drink.item_name} (${combo.drink.calories} cal, ${combo.drink.taste_profile})</div>
+                        <div class="item"><strong>Total: ${combo.totalCalories} calories</strong></div>
+                        <div class="taste-profile">Taste Profile: ${combo.tasteProfile}</div>
+                        <div class="popularity">Avg Popularity: ${combo.popularityScore.toFixed(2)}</div>
+                    </div>
+                `;
+            });
+            
+            result.innerHTML = html;
+        }
+    </script>
+</body>
+</html> 
